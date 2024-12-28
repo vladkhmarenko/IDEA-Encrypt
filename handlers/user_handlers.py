@@ -12,6 +12,9 @@ data = Data()
 @router.message(Command(commands='start'))
 async def process_start_command(message: Message):
     await message.answer(text=LEXICON_RU['/start'])
+    if message.from_user.id not in data.users.keys():
+        data.users[message.from_user.id] = {}
+
 
 @router.message(Command(commands='help'))
 async def process_help_command(message: Message):
@@ -45,8 +48,8 @@ async def process_decrypt_command(message: Message):
     pass
 
 
-@router.callback_query(str(F.data).startswith('mode'))
-async def process_mode_inline_button_pressed(callback: CallbackQuery):
+@router.callback_query(F.data == 'mode ECB')
+async def process_mode_inline_button1_pressed(callback: CallbackQuery):
     mode: str = str(callback.data)[5:]
     await callback.message.edit_text(
         text=f'{LEXICON_RU['mode_chosen']} {mode}',
@@ -55,8 +58,78 @@ async def process_mode_inline_button_pressed(callback: CallbackQuery):
     data.users[callback.from_user.id]['mode'] = mode
     await callback.answer()
 
-@router.callback_query(str(F.data).startswith('padding'))
-async def process_padding_inline_button_pressed(callback: CallbackQuery):
+@router.callback_query(F.data == 'mode CBC')
+async def process_mode_inline_button2_pressed(callback: CallbackQuery):
+    mode: str = str(callback.data)[5:]
+    await callback.message.edit_text(
+        text=f'{LEXICON_RU['mode_chosen']} {mode}',
+        reply_markup=callback.message.reply_markup
+    )
+    data.users[callback.from_user.id]['mode'] = mode
+    await callback.answer()
+
+@router.callback_query(F.data == 'mode CFB')
+async def process_mode_inline_button3_pressed(callback: CallbackQuery):
+    mode: str = str(callback.data)[5:]
+    await callback.message.edit_text(
+        text=f'{LEXICON_RU['mode_chosen']} {mode}',
+        reply_markup=callback.message.reply_markup
+    )
+    data.users[callback.from_user.id]['mode'] = mode
+    await callback.answer()
+
+@router.callback_query(F.data == 'mode OFB')
+async def process_mode_inline_button4_pressed(callback: CallbackQuery):
+    mode: str = str(callback.data)[5:]
+    await callback.message.edit_text(
+        text=f'{LEXICON_RU['mode_chosen']} {mode}',
+        reply_markup=callback.message.reply_markup
+    )
+    data.users[callback.from_user.id]['mode'] = mode
+    await callback.answer()
+
+@router.callback_query(F.data == 'mode CTR')
+async def process_mode_inline_button5_pressed(callback: CallbackQuery):
+    mode: str = str(callback.data)[5:]
+    await callback.message.edit_text(
+        text=f'{LEXICON_RU['mode_chosen']} {mode}',
+        reply_markup=callback.message.reply_markup
+    )
+    data.users[callback.from_user.id]['mode'] = mode
+    await callback.answer()
+
+@router.callback_query(F.data == 'padding ANSI X.923')
+async def process_padding_inline_button1_pressed(callback: CallbackQuery):
+    padding: str = str(callback.data)[8:]
+    await callback.message.edit_text(
+        text=f'{LEXICON_RU['padding_chosen']} {padding}',
+        reply_markup=callback.message.reply_markup
+    )
+    data.users[callback.from_user.id]['padding'] = padding
+    await callback.answer()
+
+@router.callback_query(F.data == 'padding ISO 10126')
+async def process_padding_inline_button2_pressed(callback: CallbackQuery):
+    padding: str = str(callback.data)[8:]
+    await callback.message.edit_text(
+        text=f'{LEXICON_RU['padding_chosen']} {padding}',
+        reply_markup=callback.message.reply_markup
+    )
+    data.users[callback.from_user.id]['padding'] = padding
+    await callback.answer()
+
+@router.callback_query(F.data == 'padding PKCS7')
+async def process_padding_inline_button3_pressed(callback: CallbackQuery):
+    padding: str = str(callback.data)[8:]
+    await callback.message.edit_text(
+        text=f'{LEXICON_RU['padding_chosen']} {padding}',
+        reply_markup=callback.message.reply_markup
+    )
+    data.users[callback.from_user.id]['padding'] = padding
+    await callback.answer()
+
+@router.callback_query(F.data == 'padding ISO/IEC 7816-4')
+async def process_padding_inline_button4_pressed(callback: CallbackQuery):
     padding: str = str(callback.data)[8:]
     await callback.message.edit_text(
         text=f'{LEXICON_RU['padding_chosen']} {padding}',
