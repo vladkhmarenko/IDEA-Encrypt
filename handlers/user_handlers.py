@@ -1,5 +1,5 @@
-from aiogram import Router
-from aiogram.types import Message
+from aiogram import Router, F
+from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from lexicon.lexicon import LEXICON_RU
 from data import Data
@@ -43,3 +43,24 @@ async def process_encrypt_command(message: Message):
 @router.message(Command(commands='decrypt'))
 async def process_decrypt_command(message: Message):
     pass
+
+
+@router.callback_query(str(F.data).startswith('mode'))
+async def process_mode_inline_button_pressed(callback: CallbackQuery):
+    mode: str = str(callback.data)[5:]
+    await callback.message.edit_text(
+        text=f'{LEXICON_RU['mode_chosen']} {mode}',
+        reply_markup=callback.message.reply_markup
+    )
+    data.users[callback.from_user.id]['mode'] = mode
+    await callback.answer()
+
+@router.callback_query(str(F.data).startswith('padding'))
+async def process_padding_inline_button_pressed(callback: CallbackQuery):
+    padding: str = str(callback.data)[8:]
+    await callback.message.edit_text(
+        text=f'{LEXICON_RU['padding_chosen']} {padding}',
+        reply_markup=callback.message.reply_markup
+    )
+    data.users[callback.from_user.id]['padding'] = padding
+    await callback.answer()
