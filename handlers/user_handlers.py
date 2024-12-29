@@ -60,7 +60,7 @@ async def process_decrypt_command(message: Message, state: FSMContext):
     await state.set_state(FSMFillForm.wait_for_decrypt)
 
 
-@router.callback_query(F.data == 'mode ECB')
+@router.callback_query(F.data.in_(['mode ECB', 'mode CBC', 'mode CFB', 'mode OFB', 'mode CTR']))
 async def process_mode_inline_button1_pressed(callback: CallbackQuery):
     mode: str = str(callback.data)[5:]
     await callback.message.edit_text(
@@ -70,47 +70,8 @@ async def process_mode_inline_button1_pressed(callback: CallbackQuery):
     data.users[callback.from_user.id]['mode'] = mode
     await callback.answer()
 
-@router.callback_query(F.data == 'mode CBC')
-async def process_mode_inline_button2_pressed(callback: CallbackQuery):
-    mode: str = str(callback.data)[5:]
-    await callback.message.edit_text(
-        text=f'{LEXICON_RU['mode_chosen']} {mode}',
-        reply_markup=callback.message.reply_markup
-    )
-    data.users[callback.from_user.id]['mode'] = mode
-    await callback.answer()
 
-@router.callback_query(F.data == 'mode CFB')
-async def process_mode_inline_button3_pressed(callback: CallbackQuery):
-    mode: str = str(callback.data)[5:]
-    await callback.message.edit_text(
-        text=f'{LEXICON_RU['mode_chosen']} {mode}',
-        reply_markup=callback.message.reply_markup
-    )
-    data.users[callback.from_user.id]['mode'] = mode
-    await callback.answer()
-
-@router.callback_query(F.data == 'mode OFB')
-async def process_mode_inline_button4_pressed(callback: CallbackQuery):
-    mode: str = str(callback.data)[5:]
-    await callback.message.edit_text(
-        text=f'{LEXICON_RU['mode_chosen']} {mode}',
-        reply_markup=callback.message.reply_markup
-    )
-    data.users[callback.from_user.id]['mode'] = mode
-    await callback.answer()
-
-@router.callback_query(F.data == 'mode CTR')
-async def process_mode_inline_button5_pressed(callback: CallbackQuery):
-    mode: str = str(callback.data)[5:]
-    await callback.message.edit_text(
-        text=f'{LEXICON_RU['mode_chosen']} {mode}',
-        reply_markup=callback.message.reply_markup
-    )
-    data.users[callback.from_user.id]['mode'] = mode
-    await callback.answer()
-
-@router.callback_query(F.data == 'padding ANSI X.923')
+@router.callback_query(F.data.in_(['padding ANSI X.923', 'adding ISO 10126', 'padding PKCS7', 'padding ISO/IEC 7816-4']))
 async def process_padding_inline_button1_pressed(callback: CallbackQuery):
     padding: str = str(callback.data)[8:]
     await callback.message.edit_text(
@@ -120,35 +81,6 @@ async def process_padding_inline_button1_pressed(callback: CallbackQuery):
     data.users[callback.from_user.id]['padding'] = padding
     await callback.answer()
 
-@router.callback_query(F.data == 'padding ISO 10126')
-async def process_padding_inline_button2_pressed(callback: CallbackQuery):
-    padding: str = str(callback.data)[8:]
-    await callback.message.edit_text(
-        text=f'{LEXICON_RU['padding_chosen']} {padding}',
-        reply_markup=callback.message.reply_markup
-    )
-    data.users[callback.from_user.id]['padding'] = padding
-    await callback.answer()
-
-@router.callback_query(F.data == 'padding PKCS7')
-async def process_padding_inline_button3_pressed(callback: CallbackQuery):
-    padding: str = str(callback.data)[8:]
-    await callback.message.edit_text(
-        text=f'{LEXICON_RU['padding_chosen']} {padding}',
-        reply_markup=callback.message.reply_markup
-    )
-    data.users[callback.from_user.id]['padding'] = padding
-    await callback.answer()
-
-@router.callback_query(F.data == 'padding ISO/IEC 7816-4')
-async def process_padding_inline_button4_pressed(callback: CallbackQuery):
-    padding: str = str(callback.data)[8:]
-    await callback.message.edit_text(
-        text=f'{LEXICON_RU['padding_chosen']} {padding}',
-        reply_markup=callback.message.reply_markup
-    )
-    data.users[callback.from_user.id]['padding'] = padding
-    await callback.answer()
 
 @router.message(StateFilter(FSMFillForm.wait_for_password))
 async def process_password_sent(message: Message, state: FSMContext):
