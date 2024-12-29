@@ -61,7 +61,7 @@ async def process_decrypt_command(message: Message, state: FSMContext):
 
 
 @router.callback_query(F.data.in_(['mode ECB', 'mode CBC', 'mode CFB', 'mode OFB', 'mode CTR']))
-async def process_mode_inline_button1_pressed(callback: CallbackQuery):
+async def process_mode_inline_button_pressed(callback: CallbackQuery):
     mode: str = str(callback.data)[5:]
     await callback.message.edit_text(
         text=f'{LEXICON_RU['mode_chosen']} {mode}',
@@ -72,7 +72,7 @@ async def process_mode_inline_button1_pressed(callback: CallbackQuery):
 
 
 @router.callback_query(F.data.in_(['padding ANSI X.923', 'adding ISO 10126', 'padding PKCS7', 'padding ISO/IEC 7816-4']))
-async def process_padding_inline_button1_pressed(callback: CallbackQuery):
+async def process_padding_inline_button_pressed(callback: CallbackQuery):
     padding: str = str(callback.data)[8:]
     await callback.message.edit_text(
         text=f'{LEXICON_RU['padding_chosen']} {padding}',
