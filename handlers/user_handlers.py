@@ -4,7 +4,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.types.input_file import BufferedInputFile
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state, State, StatesGroup
+from aiogram.fsm.state import State, StatesGroup
 from lexicon.lexicon import LEXICON_RU
 from data import Data
 from keyboards.keyboards import mode_keyboard, padding_keyboard
@@ -47,21 +47,21 @@ async def process_padding_command(message: Message):
 @router.message(Command(commands='encrypt'))
 async def process_encrypt_command(message: Message, state: FSMContext):
     if 'mode' not in data.users[message.from_user.id]:
-        await message.answer(text='Выберите режим шифрования с помощью команды /mode и повторите попытку')
+        await message.answer(text=LEXICON_RU['validate_mode'])
     elif 'padding' not in data.users[message.from_user.id]:
-        await message.answer(text='Выберите режим дополнения последнего блока с помощью команды /padding и повторите попытку')
+        await message.answer(text=LEXICON_RU['validate_padding'])
     else:
-        await message.answer(text='Пожалуйста, введите пароль (ключ шифрования)')
+        await message.answer(text=LEXICON_RU['choose_password'])
         await state.set_state(FSMFillForm.wait_for_password_encrypt)
 
 @router.message(Command(commands='decrypt'))
 async def process_decrypt_command(message: Message, state: FSMContext):
     if 'mode' not in data.users[message.from_user.id]:
-        await message.answer(text='Выберите режим шифрования с помощью команды /mode и повторите попытку')
+        await message.answer(text=LEXICON_RU['validate_mode'])
     elif 'padding' not in data.users[message.from_user.id]:
-        await message.answer(text='Выберите режим дополнения последнего блока с помощью команды /padding и повторите попытку')
+        await message.answer(text=LEXICON_RU['validate_padding'])
     else:
-        await message.answer(text='Пожалуйста, введите пароль (ключ шифрования)')
+        await message.answer(text=LEXICON_RU['choose_password'])
         await state.set_state(FSMFillForm.wait_for_password_decrypt)
 
 
@@ -93,7 +93,7 @@ async def process_password_sent(message: Message, state: FSMContext):
     key, iv = generate_key_iv(pw)
     data.users[message.from_user.id]['key'] = key
     data.users[message.from_user.id]['iv'] = iv
-    await message.answer(text='Спасибо!\nКлюч шифрования введен\nОтправьте текст, который необходимо зашифровать')
+    await message.answer(text=f'{LEXICON_RU['password_chosen']}\n{LEXICON_RU['ask_encrypt']}')
     await state.set_state(FSMFillForm.wait_for_encrypt)
 
 @router.message(StateFilter(FSMFillForm.wait_for_password_decrypt))
@@ -102,7 +102,7 @@ async def process_password_sent(message: Message, state: FSMContext):
     key, iv = generate_key_iv(pw)
     data.users[message.from_user.id]['key'] = key
     data.users[message.from_user.id]['iv'] = iv
-    await message.answer(text='Спасибо!\nКлюч шифрования введен\nОтправьте файл, который необходимо расшифровать')
+    await message.answer(text=f'{LEXICON_RU['password_chosen']}\n{LEXICON_RU['ask_decrypt']}')
     await state.set_state(FSMFillForm.wait_for_decrypt)
 
 @router.message(StateFilter(FSMFillForm.wait_for_encrypt))
