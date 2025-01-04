@@ -71,7 +71,7 @@ async def process_mode_inline_button_pressed(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.callback_query(F.data.in_(['padding ANSI X.923', 'adding ISO 10126', 'padding PKCS7', 'padding ISO/IEC 7816-4']))
+@router.callback_query(F.data.in_(['padding ANSI X.923', 'padding ISO 10126', 'padding PKCS7', 'padding ISO/IEC 7816-4']))
 async def process_padding_inline_button_pressed(callback: CallbackQuery):
     padding: str = str(callback.data)[8:]
     await callback.message.edit_text(
@@ -105,9 +105,10 @@ async def process_data_to_encrypt_sent(message: Message, state: FSMContext):
     file_in_memory.name = 'result.bin'  # Указываем имя файла (не обязательно, но полезно)
 
     # Отправляем файл как документ
-    document = BufferedInputFile(file_in_memory.getvalue(), "example.bin")
+    document = BufferedInputFile(file_in_memory.getvalue(), "result.bin")
     await message.answer_document(document)
     await state.clear()
+
 
 @router.message(StateFilter(FSMFillForm.wait_for_decrypt))
 async def process_data_to_decrypt_sent(message: Message, state: FSMContext, bot):
