@@ -14,7 +14,8 @@ router = Router()
 data = Data()
 
 class FSMFillForm(StatesGroup):
-    wait_for_password = State()
+    wait_for_password_encrypt = State()
+    wait_for_password_decrypt = State()
     wait_for_encrypt = State()
     wait_for_decrypt = State()
 
@@ -28,12 +29,6 @@ async def process_start_command(message: Message):
 @router.message(Command(commands='help'))
 async def process_help_command(message: Message):
     await message.answer(text=LEXICON_RU['/help'])
-
-
-@router.message(Command(commands='password'))
-async def process_password_command(message: Message, state: FSMContext):
-    await message.answer(text='Пожалуйста, введите пароль (ключ шифрования)')
-    await state.set_state(FSMFillForm.wait_for_password)
 
 @router.message(Command(commands='mode'))
 async def process_mode_command(message: Message):
@@ -51,13 +46,13 @@ async def process_padding_command(message: Message):
 
 @router.message(Command(commands='encrypt'))
 async def process_encrypt_command(message: Message, state: FSMContext):
-    await message.answer(text='Пожалуйста, введите текст, который необходимо зашифровать')
-    await state.set_state(FSMFillForm.wait_for_encrypt)
+    await message.answer(text='Пожалуйста, введите пароль (ключ шифрования)')
+    await state.set_state(FSMFillForm.wait_for_password_encrypt)
 
 @router.message(Command(commands='decrypt'))
 async def process_decrypt_command(message: Message, state: FSMContext):
-    await message.answer(text='Пожалуйста, пришлите бинарный файл, который необходимо расшифровать')
-    await state.set_state(FSMFillForm.wait_for_decrypt)
+    await message.answer(text='Пожалуйста, введите пароль (ключ шифрования)')
+    await state.set_state(FSMFillForm.wait_for_password_decrypt)
 
 
 @router.callback_query(F.data.in_(['mode ECB', 'mode CBC', 'mode CFB', 'mode OFB', 'mode CTR']))
@@ -82,14 +77,23 @@ async def process_padding_inline_button_pressed(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.message(StateFilter(FSMFillForm.wait_for_password))
+@router.message(StateFilter(FSMFillForm.wait_for_password_encrypt))
 async def process_password_sent(message: Message, state: FSMContext):
-    await message.answer(text='Спасибо!\nКлюч шифрования введен')
     pw = message.text
     key, iv = generate_key_iv(pw)
     data.users[message.from_user.id]['key'] = key
     data.users[message.from_user.id]['iv'] = iv
-    await state.clear()
+    await message.answer(text='Спасибо!\nКлюч шифрования введен\nОтправьте текст, который необходимо зашифровать')
+    await state.set_state(FSMFillForm.wait_for_encrypt)
+
+@router.message(StateFilter(FSMFillForm.wait_for_password_decrypt))
+async def process_password_sent(message: Message, state: FSMContext):
+    pw = message.text
+    key, iv = generate_key_iv(pw)
+    data.users[message.from_user.id]['key'] = key
+    data.users[message.from_user.id]['iv'] = iv
+    await message.answer(text='Спасибо!\nКлюч шифрования введен\nОтправьте файл, который необходимо расшифровать')
+    await state.set_state(FSMFillForm.wait_for_decrypt)
 
 @router.message(StateFilter(FSMFillForm.wait_for_encrypt))
 async def process_data_to_encrypt_sent(message: Message, state: FSMContext):
