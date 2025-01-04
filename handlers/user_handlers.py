@@ -46,13 +46,23 @@ async def process_padding_command(message: Message):
 
 @router.message(Command(commands='encrypt'))
 async def process_encrypt_command(message: Message, state: FSMContext):
-    await message.answer(text='Пожалуйста, введите пароль (ключ шифрования)')
-    await state.set_state(FSMFillForm.wait_for_password_encrypt)
+    if 'mode' not in data.users[message.from_user.id]:
+        await message.answer(text='Выберите режим шифрования с помощью команды /mode и повторите попытку')
+    elif 'padding' not in data.users[message.from_user.id]:
+        await message.answer(text='Выберите режим дополнения последнего блока с помощью команды /padding и повторите попытку')
+    else:
+        await message.answer(text='Пожалуйста, введите пароль (ключ шифрования)')
+        await state.set_state(FSMFillForm.wait_for_password_encrypt)
 
 @router.message(Command(commands='decrypt'))
 async def process_decrypt_command(message: Message, state: FSMContext):
-    await message.answer(text='Пожалуйста, введите пароль (ключ шифрования)')
-    await state.set_state(FSMFillForm.wait_for_password_decrypt)
+    if 'mode' not in data.users[message.from_user.id]:
+        await message.answer(text='Выберите режим шифрования с помощью команды /mode и повторите попытку')
+    elif 'padding' not in data.users[message.from_user.id]:
+        await message.answer(text='Выберите режим дополнения последнего блока с помощью команды /padding и повторите попытку')
+    else:
+        await message.answer(text='Пожалуйста, введите пароль (ключ шифрования)')
+        await state.set_state(FSMFillForm.wait_for_password_decrypt)
 
 
 @router.callback_query(F.data.in_(['mode ECB', 'mode CBC', 'mode CFB', 'mode OFB', 'mode CTR']))
